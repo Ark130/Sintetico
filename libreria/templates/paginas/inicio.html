@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block Titulo %}Inicio{% endblock %}
+
+{% block Contenido %}
+<style>
+    .custom-img-size {
+        width: 200px; /* Ajusta este valor según tus necesidades */
+        height: auto; /* Mantiene la proporción de la imagen */
+    }
+    .large-text {
+        font-size: 2.5rem; /* Ajusta este valor según tus necesidades */
+        font-weight: bold; /* Hace el texto bold */
+    }
+    .large-button-text {
+        font-size: 1.5rem; /* Ajusta este valor según tus necesidades */
+        font-weight: bold; /* Hace el texto bold */
+        padding: 10px 20px; /* Ajusta el espacio entre las paredes del botón y el texto */
+    }
+    .bold-text {
+        font-weight: bold; /* Hace el texto bold */
+    }
+    .spinner {
+        display: none; /* Oculta el spinner por defecto */
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+    }
+    .spinner-border {
+        width: 6rem; /* Ajusta este valor para cambiar el tamaño del spinner */
+        height: 6rem; /* Ajusta este valor para cambiar el tamaño del spinner */
+    }
+    .fade-out {
+        animation: fadeOut 1s forwards;
+    }
+    .fade-in {
+        animation: fadeIn 1s forwards;
+    }
+    @keyframes fadeOut {
+        to {
+            opacity: 0;
+        }
+    }
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+
+<div id="content" class="pt-5">
+    <div class="pt-5">
+        <div class="text-center pt-5">
+            <h2 class="pt-5 large-text">CALCULADORA DE DIVISIÓN SINTÉTICA</h2>
+            <a href="{% url 'ingreso' %}" class="btn btn-danger text-white mt-3 large-button-text" id="start-button">INICIAR</a>
+        </div>
+    </div>
+</div>
+
+<div id="content" class="text-center fixed-bottom">
+    <h3 class="mt-3 bold-text">PROYECTO SEMESTRAL</h3>
+    <img src="{% static 'images/LAS.png' %}" alt="Imagen LAS" class="img-fluid mb-3 custom-img-size">
+</div>
+
+<!-- Spinner de carga -->
+<div class="spinner" id="loading-spinner">
+    <div class="spinner-border text-danger" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<script>
+    document.getElementById('start-button').addEventListener('click', function(event) {
+        event.preventDefault(); // Previene la redirección inmediata
+        document.querySelectorAll('#content').forEach(function(element) {
+            element.classList.add('fade-out'); // Aplica fade-out al contenido
+        });
+        setTimeout(function() {
+            document.getElementById('loading-spinner').style.display = 'block'; // Muestra el spinner
+            document.getElementById('loading-spinner').classList.add('fade-in'); // Aplica fade-in al spinner
+            setTimeout(function() {
+                window.location.href = "{% url 'ingreso' %}"; // Redirige después de un pequeño retraso
+            }, 1000); // Ajusta el tiempo de retraso según tus necesidades
+        }, 1000); // Ajusta el tiempo de retraso para el fade-out
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block Titulo %}Ingreso{% endblock %}
+
+{% block Contenido %}
+<style>
+    .custom-button {
+        font-weight: bold;
+        padding: 10px 20px;
+    }
+    .button-spacing {
+        margin-right: 80px;
+    }
+    .fade-in {
+        animation: fadeIn 2s forwards;
+    }
+    .fade-out {
+        animation: fadeOut 1s forwards;
+    }
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0;
+        }
+    }
+</style>
+
+<div id="content" class="container mt-5 fade-in">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h3 id="header-text" class="text-center">Introduzca el grado del polinomio</h3>
+            <form id="degree-form" method="post">
+                {% csrf_token %}
+                <div class="form-group mt-3">
+                    <input type="number" id="degree-input" name="degree" class="form-control" placeholder="Grado del polinomio" min="1" step="1" required>
+                </div>
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-success custom-button button-spacing">INGRESAR</button>
+                    <a href="{% url 'inicio' %}" class="btn btn-danger custom-button">REGRESAR</a>
+                </div>
+            </form>
+
+            <form id="coefficients-form" method="post" action="{% url 'resultados' %}" style="display: none;">
+                {% csrf_token %}
+                <input type="hidden" name="degree" id="hidden-degree">
+                <div id="coefficients-container" class="form-group mt-3"></div>
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-success custom-button">INGRESAR COEFICIENTES</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('content').classList.add('fade-in');
+
+        // Step 1: Handle Degree Form Submission
+        document.getElementById('degree-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const degree = document.getElementById('degree-input').value;
+            if (degree > 0) {
+                document.getElementById('degree-form').classList.add('fade-out');
+                document.getElementById('header-text').classList.add('fade-out');
+                setTimeout(function() {
+                    document.getElementById('degree-form').style.display = 'none';
+                    document.getElementById('header-text').textContent = 'Ingrese sus coeficientes';
+                    document.getElementById('header-text').classList.remove('fade-out');
+                    document.getElementById('header-text').classList.add('fade-in');
+                    const coefficientsContainer = document.getElementById('coefficients-container');
+                    document.getElementById('hidden-degree').value = degree;
+                    for (let i = degree; i >= 0; i--) {
+                        const input = document.createElement('input');
+                        input.type = 'number';
+                        input.name = 'coefficients';
+                        input.className = 'form-control mt-2';
+                        input.placeholder = `Coeficiente de x^${i}`;
+                        input.required = true;
+                        coefficientsContainer.appendChild(input);
+                    }
+                    document.getElementById('coefficients-form').style.display = 'block';
+                    document.getElementById('coefficients-form').classList.add('fade-in');
+                }, 1000);
+            }
+        });
+
+        // Step 2: Handle Coefficients Form Submission
+        document.getElementById('coefficients-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            document.getElementById('coefficients-form').classList.add('fade-out');
+            document.getElementById('header-text').classList.add('fade-out');
+            setTimeout(function() {
+                document.getElementById('coefficients-form').style.display = 'none';
+                document.getElementById('header-text').style.display = 'none';
+                document.getElementById('content').classList.add('fade-out');
+                setTimeout(function() {
+                    document.getElementById('coefficients-form').submit();
+                }, 1000);
+            }, 1000);
+        });
+    });
+</script>
+{% endblock %}

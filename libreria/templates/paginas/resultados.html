@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load static %}
+{% block Titulo %}Resultados{% endblock %}
+{% block Contenido %}
+<style>
+    .fade-in { animation: fadeIn 2s forwards; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .result-table { width: 100%; border-collapse: collapse; margin-top: 20px; border-radius: 15px; overflow: hidden; }
+    .result-table th { background-color: #f2f2f2; color: black; padding: 8px; text-align: center; border: none; }
+    .result-table td { padding: 8px; text-align: center; border: none; }
+    .result-table tr:first-child th:not(:first-child), .result-table tr:first-child td:not(:first-child) { border-bottom: 2px solid white; }
+    .result-table tr:nth-child(3) th:not(:first-child), .result-table tr:nth-child(3) td:not(:first-child) { border-bottom: 2px solid white; }
+
+    .appear {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 1s ease-out, transform 1s ease-out;
+    }
+
+    .appear.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+</style>
+
+<div id="content" class="container mt-5 fade-in appear">
+    <div class="row justify-content-center">
+        <div class="col-md-8 appear">
+            <h3 class="text-center" style="padding-bottom: 5px;"><strong>RESULTADO DE LA DIVISIÓN SINTÉTICA</strong></h3>
+            
+            <div id="input-coefficients" class="text-center appear">
+                <br>
+                <p style="padding-top: 5px;"><strong>POLINOMIO INGRESADO:</strong> {{ polynomial_representation }}</p>
+                <br>
+            </div>
+            
+            {% if mensaje %}
+            <div class="alert alert-danger text-center">
+                {{ mensaje }}
+            </div>
+            {% endif %}
+
+            <div id="result" class="text-center">
+                {% for step in steps %}
+                <div class="step-container appear">
+                <h5 style="padding: 5px; border: 1px solid red; border-top-right-radius: 20px; border-bottom-left-radius: 20px; background-color: red;">
+                    <strong>DIVISIÓN CON EL FACTOR: {{ step.factor }}</strong>
+                </h5>
+
+                    <!-- Mostrar los valores de P, Q, divisores y factores -->
+                    <div id="step-details" class="text-center mb-3 appear">
+                        <p style="padding-top: 5px;"></p>
+                        <p><strong>POLINOMIO ACTUAL:</strong> {{ step.polynomial_representation }}</p>
+                    </div>
+
+                    <table class="result-table appear">
+                        <br>
+                        <tr>
+                            <th>Exponente</th>
+                            {% for exponent in step.exponents %}
+                                <td>x^{{ exponent }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <th>Coeficientes</th>
+                            {% for coef in step.polynomial %}
+                                <td>{{ coef }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <th>Multiplicación</th>
+                            {% for mul in step.multiplications %}
+                                <td>{{ mul }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <th>Resultado</th>
+                            {% for res in step.resultado %}
+                                <td>{{ res }}</td>
+                            {% endfor %}
+                            {% if step.resultado|length < step.exponents|length %}
+                                <td>0</td>
+                            {% endif %}
+                        </tr>
+                    </table>
+                </div>    
+                <br>
+                <br>
+                <br>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- Mostrar factores válidos utilizados en las divisiones -->
+            <div class="text-center mt-3" style="padding-bottom: 20px">
+                <h5 style= "padding:5px; border:1px solid red; border-top-right-radius: 20px; border-bottom-left-radius:20px; background-color: red; color: white;"><strong>FACTORES VÁLIDOS UTILIZADOS:</strong> {{ factores_validos|join:", " }}</h5>
+            </div>
+            
+
+
+            <div class="text-center mt-3">
+                <a href="{% url 'ingreso' %}" class="btn btn-primary"><strong>INGRESAR OTRO POLINOMIO?</strong></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const elements = document.querySelectorAll('.appear');
+        const button = document.querySelector('.btn-primary');
+        const showOnScroll = () => {
+            elements.forEach((el) => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top <= window.innerHeight - 100 && rect.bottom >= 0) {
+                    el.classList.add('show');
+                } else {
+                    el.classList.remove('show');
+                }
+            });
+            
+        };
+        
+        window.addEventListener('scroll', showOnScroll);
+        showOnScroll(); // Ejecutar una vez para mostrar los elementos que ya están en vista al cargar la página
+    });
+
+</script>    
+
+{% endblock %}
